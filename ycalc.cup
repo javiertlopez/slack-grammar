@@ -1,0 +1,131 @@
+
+import java_cup.runtime.*;
+   
+action code {:
+
+ public String x = "" ; 
+ 
+:}
+parser code {:
+
+   
+    
+    
+    public void report_error(String message, Object info) {
+   
+        StringBuilder m = new StringBuilder("Error");
+   
+         if (info instanceof java_cup.runtime.Symbol) {
+            
+            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
+   
+             if (s.left >= 0) {                
+                  m.append(" in line "+(s.left+1));   
+               	 
+               	  if (s.right >= 0)                    
+                 	 m.append(", column "+(s.right+1));
+            }
+        }
+   
+        m.append(" : "+message);
+   
+        System.err.println(m);
+    }
+   
+    
+    public void report_fatal_error(String message, Object info) {
+        report_error(message, info);
+        System.exit(1);
+    }
+:};
+   
+
+   
+/* ------------Declaration of Terminals and Non Terminals Section----------- */
+   
+
+terminal           SEMI, TIMES, LPAREN, RPAREN, ESPACIO, COMODIN, UNION, EPSILON;
+terminal String    LETRA, NUMBER;
+   
+non terminal Object     expr_list, expr_part;
+non terminal String     expr, star, conc, term;
+  
+
+/* -------------Precedence and Associatively of Terminals Section----------- */
+      
+  precedence left UNION; 
+  precedence left TIMES;
+
+/* ----------------------------Grammar Section-------------------- */
+   
+/*----------------------------------------------   
+   expr_list ::=   expr_list expr_part
+                 | expr_part 
+              
+   expr_part ::=   expr SEMI
+   expr      ::=   expr UNION conc
+                 | conc
+   conc    ::=   conc star
+                 | star
+   star     ::=  star TIMES
+   				 | term
+   term     ::=    LPAREN expr RPAREN
+                 | NUMBER
+                 | ESPACIO
+                 | COMODIN
+                 | LETRA  
+                 | EPSILON
+                 
+----------------------------------------------------*/
+   
+   expr_list ::= expr_list expr_part
+                 |
+                 expr_part
+                 ;
+               
+   expr_part ::= expr:e
+                 {:   System.out.println(x); x="";:}
+                 SEMI
+                 ;
+
+   
+   expr      ::= expr:e UNION conc:c
+                 {: x+=", ";:}
+                 |
+                 conc:c
+                 {:  :}
+                 ;
+   conc      ::= conc:c star:f
+                 {: x+=". ";:}
+                 |
+                 star:f
+                 {:  :}
+                 ;              
+   
+  star    ::= star:f TIMES
+                 {: x+="* "; :}
+                 |
+                 term:t
+                 {:   :}
+                 ;
+   
+  term      ::= LPAREN expr:e RPAREN
+                 {:  :}
+                 |
+                 NUMBER:n
+                 {: x+= n+" ";:}
+                 |
+                 ESPACIO:es
+                 {: x+= "_ "; :}
+                 |
+                 COMODIN:c
+                 {: x+="& ";  :}   
+                 |
+                 LETRA:l
+                 {: x+=l+" "; :}
+                 |
+                 EPSILON:e
+                 {: x+="$ "; :}
+                 ;
+                 
+  
