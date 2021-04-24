@@ -1,0 +1,9 @@
+a*;
+a , b c ; 
+a,(bca,a)*; 
+a,(bca,a)**; 
+a,(bca,a)*,K*; 
+12*a,b*;
+1,(ba)*;
+(ab,(cd,a)b);
+$;
