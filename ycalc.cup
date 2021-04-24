@@ -1,80 +1,103 @@
-
 import java_cup.runtime.*;
-   
-action code {:
 
- public String x = "" ; 
- 
+action code {:
+    public String x = "" ;
 :}
 parser code {:
-
-   
-    
-    
     public void report_error(String message, Object info) {
-   
         StringBuilder m = new StringBuilder("Error");
-   
          if (info instanceof java_cup.runtime.Symbol) {
-            
+
             java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
-   
-             if (s.left >= 0) {                
-                  m.append(" in line "+(s.left+1));   
-               	 
-               	  if (s.right >= 0)                    
-                 	 m.append(", column "+(s.right+1));
+            if (s.left >= 0) {
+                m.append(" in line "+(s.left+1));
+
+                if (s.right >= 0) {
+                    m.append(", column "+(s.right+1));
+                }
             }
         }
-   
+
         m.append(" : "+message);
-   
         System.err.println(m);
     }
-   
-    
+
     public void report_fatal_error(String message, Object info) {
         report_error(message, info);
         System.exit(1);
     }
 :};
-   
 
-   
+
+
 /* ------------Declaration of Terminals and Non Terminals Section----------- */
-   
 
-terminal           SEMI, TIMES, LPAREN, RPAREN, ESPACIO, COMODIN, UNION, EPSILON;
-terminal String    LETRA, NUMBER;
-   
+terminal           SEMI, LPAREN, RPAREN, LKEY, RKEY, UNION, IF, ELSE, FOR, IN, CONST, CONVERSATION, CHAT;
+terminal           MESSAGE, CREATE, INVITE, PURPOSE, ARCHIVE, KICK, RENAME, MEMBERS, TRUE, FALSE, AND;
+terminal           OR, EQUAL, DIFFERENT, ASSIGN, LBRACKET, RBRACKET, LESS, BIGGER, EQUALBIGGER, EQUALLESSER;
+terminal String    ID, STRING;
+
 non terminal Object     expr_list, expr_part;
 non terminal String     expr, star, conc, term;
-  
 
 /* -------------Precedence and Associatively of Terminals Section----------- */
-      
-  precedence left UNION; 
-  precedence left TIMES;
+
+precedence left UNION;
 
 /* ----------------------------Grammar Section-------------------- */
-   
-/*----------------------------------------------   
-   expr_list ::=   expr_list expr_part
-                 | expr_part 
-              
-   expr_part ::=   expr SEMI
-   expr      ::=   expr UNION conc
-                 | conc
-   conc    ::=   conc star
-                 | star
-   star     ::=  star TIMES
-   				 | term
-   term     ::=    LPAREN expr RPAREN
-                 | NUMBER
-                 | ESPACIO
-                 | COMODIN
-                 | LETRA  
-                 | EPSILON
+
+/*----------------------------------------------
+    bloque      ::= LKEY instrs RKEY
+
+    instrs      ::= instrs instr
+                    | EPSILON
+
+    instr       ::= loc ASSIGN bool SEMI
+                    | IF LPAREN bool RPAREN instr
+                    | IF LPAREN bool RPAREN instr ELSE instr
+                    | FOR ID IN ID instr
+                    | CONVERSATION actions SEMI
+                    | CHAT MESSAGE option option SEMI
+                    | bloque
+
+    actions     ::= CREATE bool option
+                    | INVITE option option
+                    | KICK option option
+                    | RENAME option option
+                    | PURPOSE option option
+                    | ARCHIVE option
+                    | MEMBERS option
+
+    option      ::= ID
+                    | STRING strings
+
+    loc         ::= CONST ID
+                    | ID
+
+    bool        ::= CONVERSATION actions SEMI
+                    | BOOL OR comb
+                    | comb
+
+    comb        ::= comb AND igualdad
+                    | igualdad
+
+    igualdad    ::= igualdad EQUAL rel
+                    | igualdad DIFFERENT rel
+                    | rel
+
+    rel         ::= factor LESS factor
+                    | factor BIGGER factor
+                    | factor EQUALLESSER factor
+                    | factor EQUALBIGGER factor
+                    | factor
+
+    factor      ::= TRUE
+                    | FALSE
+                    | STRING
+                    | LBRACKET STRING strings RBRACKET
+
+    strings     ::= UNION STRING strings
+                    | EPSILON
                  
 ----------------------------------------------------*/
    
