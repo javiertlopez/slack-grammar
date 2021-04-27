@@ -32,9 +32,9 @@ parser code {:
 
 /* ------------Declaration of Terminals and Non Terminals Section----------- */
 
-terminal           SEMI, LPAREN, RPAREN, LKEY, RKEY, UNION, IF, ELSE, FOR, IN, CONST, CONVERSATION, CHAT;
-terminal           MESSAGE, CREATE, INVITE, PURPOSE, ARCHIVE, KICK, RENAME, MEMBERS, TRUE, FALSE, AND;
-terminal           OR, EQUAL, DIFFERENT, ASSIGN, LBRACKET, RBRACKET, LESS, BIGGER, EQUALBIGGER, EQUALLESSER, EPSILON;
+terminal           SEMI, LPAREN, RPAREN, LKEY, RKEY, UNION, IF, ELSE, FOR, IN, CONST, CONVERSATION, CHAT,
+      				MESSAGE, CREATE, INVITE, PURPOSE, ARCHIVE, KICK, RENAME, MEMBERS, TRUE, FALSE, AND,
+					OR, EQUAL, DIFFERENT, ASSIGN, LBRACKET, RBRACKET, LESS, BIGGER, EQUALBIGGER, EQUALLESSER, EPSILON;
 terminal String    ID, STRING;
 
 non terminal Object     bloque, instrs, instr, actions, option, loc, comb, igualdad, rel, factor, strings, bool;

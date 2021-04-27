@@ -37,26 +37,26 @@ string = \" [a-zA-Z_@0-9.] \"
    ";"                 { return symbol(sym.SEMI); }
     "("                { return symbol(sym.LPAREN); }
     ")"                { return symbol(sym.RPAREN); }
-    ","				   { return symbol(sym.UNION) }
-    "if"				{ return symbol(sym.IF) }
-    "else"				{ return symbol(sym.ELSE) }
-    "for"				{ return symbol(sym.FOR) }
-    "in"				{ return symbol(sym.IN) }
-    "const"				{ return symbol(sym.CONST) }
-    "conversation"		{ return symbol(sym.CONVERSATION) }
-    "chat"				{ return symbol(sym.CHAT) }
-    "message"			{ return symbol(sym.MESSAGE) }
-    "{"					{ return symbol(sym.LKEY) }
-    "}"					{ return symbol(sym.RKEY) }
-    "create"			{ return symbol(sym.CREATE) }
-    "invite"			{ return symbol(sym.INVITE) }
-    "purpose"			{ return symbol(sym.PURPOSE) }
-    "archive"			{ return symbol(sym.ARCHIVE) }
-    "kick"				{ return symbol(sym.KICK) }
-    "rename"			{ return symbol(sym.RENAME) }
-    "members"			{ return symbol(sym.MEMBER) }
-    "true"			    { return symbol(sym.TRUE) }
-    "false"				{ return symbol(sym.FALSE) }
+    ","				   { return symbol(sym.UNION); }
+    "if"				{ return symbol(sym.IF); }
+    "else"				{ return symbol(sym.ELSE); }
+    "for"				{ return symbol(sym.FOR); }
+    "in"				{ return symbol(sym.IN); }
+    "const"				{ return symbol(sym.CONST); }
+    "conversation"		{ return symbol(sym.CONVERSATION); }
+    "chat"				{ return symbol(sym.CHAT); }
+    "message"			{ return symbol(sym.MESSAGE); }
+    "{"					{ return symbol(sym.LKEY); }
+    "}"					{ return symbol(sym.RKEY); }
+    "create"			{ return symbol(sym.CREATE); }
+    "invite"			{ return symbol(sym.INVITE); }
+    "purpose"			{ return symbol(sym.PURPOSE); }
+    "archive"			{ return symbol(sym.ARCHIVE); }
+    "kick"				{ return symbol(sym.KICK); }
+    "rename"			{ return symbol(sym.RENAME); }
+    "members"			{ return symbol(sym.MEMBER); }
+    "true"			    { return symbol(sym.TRUE); }
+    "false"				{ return symbol(sym.FALSE); }
      "&&"				{ return symbol(sym.AND); }
      "||"				{ return symbol(sym.OR); }
      "=="				{ return symbol(sym.EQUAL); }

@@ -720,15 +720,15 @@ class Lexer implements java_cup.runtime.Scanner {
           }
         case 44: break;
         case 7: 
-          { return symbol(sym.UNION)
+          { return symbol(sym.UNION);
           }
         case 45: break;
         case 8: 
-          { return symbol(sym.LKEY)
+          { return symbol(sym.LKEY);
           }
         case 46: break;
         case 9: 
-          { return symbol(sym.RKEY)
+          { return symbol(sym.RKEY);
           }
         case 47: break;
         case 10: 
@@ -752,11 +752,11 @@ class Lexer implements java_cup.runtime.Scanner {
           }
         case 52: break;
         case 15: 
-          { return symbol(sym.IF)
+          { return symbol(sym.IF);
           }
         case 53: break;
         case 16: 
-          { return symbol(sym.IN)
+          { return symbol(sym.IN);
           }
         case 54: break;
         case 17: 
@@ -788,63 +788,63 @@ class Lexer implements java_cup.runtime.Scanner {
           }
         case 61: break;
         case 24: 
-          { return symbol(sym.FOR)
+          { return symbol(sym.FOR);
           }
         case 62: break;
         case 25: 
-          { return symbol(sym.ELSE)
+          { return symbol(sym.ELSE);
           }
         case 63: break;
         case 26: 
-          { return symbol(sym.CHAT)
+          { return symbol(sym.CHAT);
           }
         case 64: break;
         case 27: 
-          { return symbol(sym.TRUE)
+          { return symbol(sym.TRUE);
           }
         case 65: break;
         case 28: 
-          { return symbol(sym.KICK)
+          { return symbol(sym.KICK);
           }
         case 66: break;
         case 29: 
-          { return symbol(sym.FALSE)
+          { return symbol(sym.FALSE);
           }
         case 67: break;
         case 30: 
-          { return symbol(sym.CONST)
+          { return symbol(sym.CONST);
           }
         case 68: break;
         case 31: 
-          { return symbol(sym.INVITE)
+          { return symbol(sym.INVITE);
           }
         case 69: break;
         case 32: 
-          { return symbol(sym.RENAME)
+          { return symbol(sym.RENAME);
           }
         case 70: break;
         case 33: 
-          { return symbol(sym.CREATE)
+          { return symbol(sym.CREATE);
           }
         case 71: break;
         case 34: 
-          { return symbol(sym.ARCHIVE)
+          { return symbol(sym.ARCHIVE);
           }
         case 72: break;
         case 35: 
-          { return symbol(sym.MESSAGE)
+          { return symbol(sym.MESSAGE);
           }
         case 73: break;
         case 36: 
-          { return symbol(sym.MEMBER)
+          { return symbol(sym.MEMBER);
           }
         case 74: break;
         case 37: 
-          { return symbol(sym.PURPOSE)
+          { return symbol(sym.PURPOSE);
           }
         case 75: break;
         case 38: 
-          { return symbol(sym.CONVERSATION)
+          { return symbol(sym.CONVERSATION);
           }
         case 76: break;
         default: 
