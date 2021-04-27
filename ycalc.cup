@@ -1,7 +1,7 @@
 import java_cup.runtime.*;
 
 action code {:
-    public String x = "" ;
+    
 :}
 parser code {:
     public void report_error(String message, Object info) {
@@ -34,15 +34,13 @@ parser code {:
 
 terminal           SEMI, LPAREN, RPAREN, LKEY, RKEY, UNION, IF, ELSE, FOR, IN, CONST, CONVERSATION, CHAT;
 terminal           MESSAGE, CREATE, INVITE, PURPOSE, ARCHIVE, KICK, RENAME, MEMBERS, TRUE, FALSE, AND;
-terminal           OR, EQUAL, DIFFERENT, ASSIGN, LBRACKET, RBRACKET, LESS, BIGGER, EQUALBIGGER, EQUALLESSER;
+terminal           OR, EQUAL, DIFFERENT, ASSIGN, LBRACKET, RBRACKET, LESS, BIGGER, EQUALBIGGER, EQUALLESSER, EPSILON;
 terminal String    ID, STRING;
 
-non terminal Object     expr_list, expr_part;
-non terminal String     expr, star, conc, term;
+non terminal Object     bloque, instrs, instr, actions, option, loc, comb, igualdad, rel, factor, strings, bool;
 
 /* -------------Precedence and Associatively of Terminals Section----------- */
 
-precedence left UNION;
 
 /* ----------------------------Grammar Section-------------------- */
 
@@ -75,7 +73,7 @@ precedence left UNION;
                     | ID
 
     bool        ::= CONVERSATION actions SEMI
-                    | BOOL OR comb
+                    | bool OR comb
                     | comb
 
     comb        ::= comb AND igualdad
@@ -100,55 +98,97 @@ precedence left UNION;
                     | EPSILON
                  
 ----------------------------------------------------*/
-   
-   expr_list ::= expr_list expr_part
-                 |
-                 expr_part
-                 ;
-               
-   expr_part ::= expr:e
-                 {:   System.out.println(x); x="";:}
-                 SEMI
-                 ;
 
-   
-   expr      ::= expr:e UNION conc:c
-                 {: x+=", ";:}
-                 |
-                 conc:c
-                 {:  :}
-                 ;
-   conc      ::= conc:c star:f
-                 {: x+=". ";:}
-                 |
-                 star:f
-                 {:  :}
-                 ;              
-   
-  star    ::= star:f TIMES
-                 {: x+="* "; :}
-                 |
-                 term:t
-                 {:   :}
-                 ;
-   
-  term      ::= LPAREN expr:e RPAREN
-                 {:  :}
-                 |
-                 NUMBER:n
-                 {: x+= n+" ";:}
-                 |
-                 ESPACIO:es
-                 {: x+= "_ "; :}
-                 |
-                 COMODIN:c
-                 {: x+="& ";  :}   
-                 |
-                 LETRA:l
-                 {: x+=l+" "; :}
-                 |
-                 EPSILON:e
-                 {: x+="$ "; :}
-                 ;
+	 bloque      ::= LKEY instrs RKEY
+	 				{: System.out.println("entrada aceptada"); :}
+	 				;
+
+    instrs      ::= instrs instr
+                    | 
+                    EPSILON
+                    ;
+
+    instr       ::= loc ASSIGN bool SEMI
+                    | 
+                    IF LPAREN bool RPAREN instr
+                    | 
+                    IF LPAREN bool RPAREN instr ELSE instr
+                    | 
+                    FOR ID IN ID instr
+                    | 
+                    CONVERSATION actions SEMI
+                    | 
+                    CHAT MESSAGE option option SEMI
+                    | 
+                    bloque
+                    ;
+
+    actions     ::= CREATE bool option
+                    | 
+                    INVITE option option
+                    | 
+                    KICK option option
+                    | 
+                    RENAME option option
+                    | 
+                    PURPOSE option option
+                    | 
+                    ARCHIVE option
+                    | 
+                    MEMBERS option
+                    ;
+
+    option      ::= ID
+                    | 
+                    STRING strings
+                    ;
+
+    loc         ::= CONST ID
+                    | 
+                    ID
+                    ;
+
+    bool        ::= CONVERSATION actions SEMI
+                    | 
+                    bool OR comb
+                    | 
+                    comb
+                    ;
+
+    comb        ::= comb AND igualdad
+                    | 
+                    igualdad
+                    ;
+
+    igualdad    ::= igualdad EQUAL rel
+                    | 
+                    igualdad DIFFERENT rel
+                    | 
+                    rel
+                    ;
+
+    rel         ::= factor LESS factor
+                    | 
+                    factor BIGGER factor
+                    | 
+                    factor EQUALLESSER factor
+                    | 
+                    factor EQUALBIGGER factor
+                    | 
+                    factor
+                    ;
+
+    factor      ::= TRUE
+                    | 
+                    FALSE
+                    | 
+                    STRING
+                    | 
+                    LBRACKET STRING strings RBRACKET
+                    ;
+
+    strings     ::= UNION STRING strings
+                    | 
+                    EPSILON
+                    ;
                  
-  
