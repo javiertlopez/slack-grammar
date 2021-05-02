@@ -1,8 +1,6 @@
 import java_cup.runtime.*;
 
-action code {:
-    
-:}
+
 parser code {:
     public void report_error(String message, Object info) {
         StringBuilder m = new StringBuilder("Error");
@@ -34,21 +32,21 @@ parser code {:
 
 terminal           SEMI, LPAREN, RPAREN, LKEY, RKEY, UNION, IF, ELSE, FOR, IN, CONST, CONVERSATION, CHAT,
       				MESSAGE, CREATE, INVITE, PURPOSE, ARCHIVE, KICK, RENAME, MEMBERS, TRUE, FALSE, AND,
-					OR, EQUAL, DIFFERENT, ASSIGN, LBRACKET, RBRACKET, LESS, BIGGER, EQUALBIGGER, EQUALLESSER, EPSILON;
+					OR, EQUAL, DIFFERENT, ASSIGN, LBRACKET, RBRACKET, LESS, BIGGER, EQUALBIGGER, EQUALLESSER;
 terminal String    ID, STRING;
 
 non terminal Object     bloque, instrs, instr, actions, option, loc, comb, igualdad, rel, factor, strings, bool;
 
 /* -------------Precedence and Associatively of Terminals Section----------- */
 
-
+precedence left ELSE;
 /* ----------------------------Grammar Section-------------------- */
 
 /*----------------------------------------------
     bloque      ::= LKEY instrs RKEY
 
     instrs      ::= instrs instr
-                    | EPSILON
+                    | 
 
     instr       ::= loc ASSIGN bool SEMI
                     | IF LPAREN bool RPAREN instr
@@ -93,24 +91,24 @@ non terminal Object     bloque, instrs, instr, actions, option, loc, comb, igual
                     | FALSE
                     | STRING
                     | LBRACKET STRING strings RBRACKET
+                    | ID
 
     strings     ::= UNION STRING strings
-                    | EPSILON
+                    | 
                  
 ----------------------------------------------------*/
 
-	 bloque      ::= LKEY instrs RKEY
-	 				{: System.out.println("entrada aceptada"); :}
+	bloque      ::= LKEY instrs RKEY
 	 				;
 
     instrs      ::= instrs instr
                     | 
-                    EPSILON
+                    
                     ;
 
     instr       ::= loc ASSIGN bool SEMI
                     | 
-                    IF LPAREN bool RPAREN instr
+                    IF LPAREN bool RPAREN instr 
                     | 
                     IF LPAREN bool RPAREN instr ELSE instr
                     | 
@@ -185,10 +183,12 @@ non terminal Object     bloque, instrs, instr, actions, option, loc, comb, igual
                     STRING
                     | 
                     LBRACKET STRING strings RBRACKET
+                    |
+                    ID
                     ;
 
     strings     ::= UNION STRING strings
                     | 
-                    EPSILON
+                    
                     ;
                  

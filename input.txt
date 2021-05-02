@@ -1,9 +1,37 @@
-a*;
-a , b c ; 
-a,(bca,a)*; 
-a,(bca,a)**; 
-a,(bca,a)*,K*; 
-12*a,b*;
-1,(ba)*;
-(ab,(cd,a)b);
-$;
+{
+const users = ["pedro@gmail.com", "juan@outlook.com", "chuy@outlook.com", "bryan@gmail.com"]; 
+rooms = ["room1", "room2", "room3", "room4"]; 
+const theRoom = "the room 101"; 
+
+for item in rooms { 
+
+  conversation create true item; 
+
+  for user in users{ 
+    if(item == "room1" && user == "juan@outlook.com") {}
+    else{ 
+      conversation invite item user; 
+      conversation invite theRoom user; 
+    } 
+  } 
+  chat message item "welcome to the chat"; 
+
+  if(item == "room1") {
+    conversation purpose item "business chat"; 
+    chat message item "remember this chat is for business only";
+  } 
+  else if(item == "room2"){ 
+    conversation purpose item "casual talk"; 
+    chat message item "lets get along!"; 
+    conversation rename item "just talking room"; 
+  } 
+  else 
+    conversation purpose item "extra chat"; 
+} 
+
+  
+
+conversation kick theRoom "pedro@gmail.com"; 
+
+conversation archive theRoom; 
+}

@@ -26,7 +26,7 @@ LineTerminator = \r|\n|\r\n
 WhiteSpace     = {LineTerminator} | [\ \t\f]
 letra = [A-Za-z]
 id = [A-Za-z] + [A-Za-z_0-9]*
-string = \" [a-zA-Z_@0-9.] \"
+string = \"[a-zA-Z_@0-9.!?\ ]*\"
 
 
 %%  
@@ -54,7 +54,7 @@ string = \" [a-zA-Z_@0-9.] \"
     "archive"			{ return symbol(sym.ARCHIVE); }
     "kick"				{ return symbol(sym.KICK); }
     "rename"			{ return symbol(sym.RENAME); }
-    "members"			{ return symbol(sym.MEMBER); }
+    "members"			{ return symbol(sym.MEMBERS); }
     "true"			    { return symbol(sym.TRUE); }
     "false"				{ return symbol(sym.FALSE); }
      "&&"				{ return symbol(sym.AND); }
@@ -67,13 +67,12 @@ string = \" [a-zA-Z_@0-9.] \"
      "<"				{ return symbol(sym.LESS); }
      "=" 				{ return symbol(sym.ASSIGN); }
      "["				{ return symbol(sym.LBRACKET); }
-     "]"				   { return symbol(sym.RBRACKET); }
-                     
-     
+     "]"				{ return symbol(sym.RBRACKET); }
+     "\""				{}
     
     
-   	{string} 	  { return symbol(sym.STRING, yytext()); }	
-    {id}      { return symbol(sym.ID, yytext()); }
+   	{string} 	  { return symbol(sym.STRING); }	
+    {id}      { return symbol(sym.ID); }
 
    
     {WhiteSpace}       { /* do nothing */ }   

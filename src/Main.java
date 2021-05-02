@@ -35,11 +35,12 @@ public class Main {
       
      
 	Object result = p.parse().value;   
-;
+	System.out.println("Input Accepted");
 	
     } catch (Exception e) {
       /* do cleanup here -- possibly rethrow e */
-      e.printStackTrace();
+    	e.getMessage();
+    	e.printStackTrace();
     }
   }
 }

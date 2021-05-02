@@ -25,6 +25,4 @@ public class GenerateParser {
 		st[0] = path;
 		java_cup.Main.main(st);
 	}
-	
-
 }
