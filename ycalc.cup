@@ -1,5 +1,14 @@
 import java_cup.runtime.*;
 
+   
+action code {:
+
+ public String testString = "" ; 
+ public static String API_VAR = "slack.api";
+ 
+ 
+:}
+
 
 parser code {:
     public void report_error(String message, Object info) {
@@ -32,10 +41,11 @@ parser code {:
 
 terminal           SEMI, LPAREN, RPAREN, LKEY, RKEY, UNION, IF, ELSE, FOR, IN, CONST, CONVERSATION, CHAT,
       				MESSAGE, CREATE, INVITE, PURPOSE, ARCHIVE, KICK, RENAME, MEMBERS, TRUE, FALSE, AND,
-					OR, EQUAL, DIFFERENT, ASSIGN, LBRACKET, RBRACKET, LESS, BIGGER, EQUALBIGGER, EQUALLESSER;
+					OR, EQUAL, DIFFERENT, ASSIGN, LBRACKET, RBRACKET, LESS, BIGGER, EQUALBIGGER, EQUALLESSER, LET;
 terminal String    ID, STRING;
 
-non terminal Object     bloque, instrs, instr, actions, option, loc, comb, igualdad, rel, factor, strings, bool;
+non terminal Object     bloque, instrs, instr, programa;
+non terminal String 	strings, actions, option,comb, igualdad, rel, factor, bool, loc;
 
 /* -------------Precedence and Associatively of Terminals Section----------- */
 
@@ -43,31 +53,35 @@ precedence left ELSE;
 /* ----------------------------Grammar Section-------------------- */
 
 /*----------------------------------------------
+	programa    ::= bloque 
+	
     bloque      ::= LKEY instrs RKEY
 
-    instrs      ::= instrs instr
+    instrs      ::= instr instrs
                     | 
 
     instr       ::= loc ASSIGN bool SEMI
                     | IF LPAREN bool RPAREN instr
                     | IF LPAREN bool RPAREN instr ELSE instr
                     | FOR ID IN ID instr
-                    | CONVERSATION actions SEMI
+                    | CONVERSATION actions:act SEMI
+                    {: System.out.println(act + ";");
                     | CHAT MESSAGE option option SEMI
                     | bloque
 
-    actions     ::= CREATE bool option
-                    | INVITE option option
-                    | KICK option option
-                    | RENAME option option
-                    | PURPOSE option option
-                    | ARCHIVE option
-                    | MEMBERS option
+    actions     ::= CREATE bool:b option:op	
+                    | INVITE option:op1 option:op2
+                    | KICK option:op1 option:op2
+                    | RENAME option:op1 option:op2
+                    | PURPOSE option:op1 option:op2
+                    | ARCHIVE option:op
+                    | MEMBERS option:op
 
     option      ::= ID
-                    | STRING strings
+                    | STRING strings 
 
     loc         ::= CONST ID
+    				| LET ID
                     | ID
 
     bool        ::= CONVERSATION actions SEMI
@@ -97,16 +111,19 @@ precedence left ELSE;
                     | 
                  
 ----------------------------------------------------*/
-
+	programa	::= bloque {: System.out.println("program"); :}
+					;
+	
 	bloque      ::= LKEY instrs RKEY
 	 				;
 
-    instrs      ::= instrs instr
+    instrs      ::= instr instrs
                     | 
                     
                     ;
 
-    instr       ::= loc ASSIGN bool SEMI
+    instr       ::= loc:l ASSIGN bool:b SEMI 
+    				{: System.out.println(l+" = " + b + ";"); :}
                     | 
                     IF LPAREN bool RPAREN instr 
                     | 
@@ -114,55 +131,72 @@ precedence left ELSE;
                     | 
                     FOR ID IN ID instr
                     | 
-                    CONVERSATION actions SEMI
+                    CONVERSATION actions:act SEMI {: System.out.println(act + ";"); :}
                     | 
-                    CHAT MESSAGE option option SEMI
+                    CHAT MESSAGE option:op1 option:op2 SEMI
+                    {: 
+                    	testString = "slack.api('chat.postMessage', {\n\tchannel: " + op1 + ",\n\ttext: " + op2 + "\n});"; 
+                    	System.out.println(testString);
+                    	:} 
                     | 
                     bloque
                     ;
 
-    actions     ::= CREATE bool option
+    actions     ::= CREATE bool:b option:op
+    				{: RESULT = "slack.api('conversations.create', {\n\tis_private: " + b +",\n\tname: " + op + "\n})";:}
                     | 
-                    INVITE option option
+                    INVITE option:op1 option:op2
+                    {: RESULT = "slack.api('conversations.invite', {\n\tchannel: " + op1 +",\n\tusers: " + op2 + "\n})";:}
                     | 
-                    KICK option option
+                    KICK option:op1 option:op2
+                    {: RESULT = "slack.api('conversations.kick', {\n\ttchannel: " + op1 +",\n\tuser: " + op2 + "\n})";:}
                     | 
-                    RENAME option option
+                    RENAME option:op1 option:op2
+                    {: RESULT = "slack.api('conversations.rename', {\n\ttchannel: " + op1 +",\n\tname: " + op2 + "\n})";:}
                     | 
-                    PURPOSE option option
+                    PURPOSE option:op1 option:op2
+                    {: RESULT = "slack.api('conversations.setPurpose', {\n\tchannel: " + op1 +",\n\tpurpose: " + op2 + "\n})";:}
                     | 
-                    ARCHIVE option
+                    ARCHIVE option:op
+                    {: RESULT = "slack.api('conversations.archive', {\n\ttchannel: " + op + "\n})";:}
                     | 
-                    MEMBERS option
+                    MEMBERS option:op
+                    {: RESULT = "slack.api('conversations.members', {\n\tchannel: " + op + "\n})";:}
                     ;
 
-    option      ::= ID
+    option      ::= ID:id {: RESULT = id; :}
                     | 
-                    STRING strings
+                    STRING:s strings:ss
+                    {: RESULT = s + ss; :}
                     ;
 
-    loc         ::= CONST ID
+    loc         ::= CONST ID:id
+    				{: RESULT = "const " + id; :}
                     | 
+                    LET ID:id
+                    {:  RESULT = "let " + id; :}
+                    |
                     ID
+                    {::}
                     ;
 
     bool        ::= CONVERSATION actions SEMI
                     | 
                     bool OR comb
                     | 
-                    comb
+                    comb:c {: RESULT = c; :}
                     ;
 
     comb        ::= comb AND igualdad
                     | 
-                    igualdad
+                    igualdad:i {: RESULT = i; :}
                     ;
 
     igualdad    ::= igualdad EQUAL rel
                     | 
                     igualdad DIFFERENT rel
                     | 
-                    rel
+                    rel:r {: RESULT = r; :}
                     ;
 
     rel         ::= factor LESS factor
@@ -173,22 +207,23 @@ precedence left ELSE;
                     | 
                     factor EQUALBIGGER factor
                     | 
-                    factor
+                    factor:f {: RESULT = f; :} 
                     ;
 
-    factor      ::= TRUE
+    factor      ::= TRUE {: RESULT = "true"; :}
                     | 
-                    FALSE
+                    FALSE {: RESULT = "false"; :}
                     | 
-                    STRING
+                    STRING:s {: RESULT = s; :}
                     | 
-                    LBRACKET STRING strings RBRACKET
+                    LBRACKET STRING:s strings:ss RBRACKET 
+                    {: RESULT = "[" + s + ss + "]"; :}
                     |
-                    ID
+                    ID:id {: RESULT = id; :}
                     ;
 
-    strings     ::= UNION STRING strings
+    strings     ::= UNION STRING:s strings:ss {: RESULT = ", " + s + ss; :} 
                     | 
-                    
+                   		{: RESULT = ""; :}
                     ;
                  

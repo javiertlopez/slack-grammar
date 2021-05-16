@@ -57,6 +57,7 @@ string = \"[a-zA-Z_@0-9.!?\ ]*\"
     "members"			{ return symbol(sym.MEMBERS); }
     "true"			    { return symbol(sym.TRUE); }
     "false"				{ return symbol(sym.FALSE); }
+    "let"				{ return symbol(sym.LET); }
      "&&"				{ return symbol(sym.AND); }
      "||"				{ return symbol(sym.OR); }
      "=="				{ return symbol(sym.EQUAL); }
@@ -71,8 +72,8 @@ string = \"[a-zA-Z_@0-9.!?\ ]*\"
      "\""				{}
     
     
-   	{string} 	  { return symbol(sym.STRING); }	
-    {id}      { return symbol(sym.ID); }
+   	{string} 	  { return symbol(sym.STRING, yytext()); }	
+    {id}      { return symbol(sym.ID, yytext()); }
 
    
     {WhiteSpace}       { /* do nothing */ }   

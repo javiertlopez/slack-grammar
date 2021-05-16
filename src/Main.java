@@ -35,11 +35,11 @@ public class Main {
       
      
 	Object result = p.parse().value;   
-	System.out.println("Input Accepted");
+	System.out.println();
+	System.out.println("Finished analisis");
 	
     } catch (Exception e) {
       /* do cleanup here -- possibly rethrow e */
-    	e.getMessage();
     	e.printStackTrace();
     }
   }
