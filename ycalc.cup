@@ -1,12 +1,11 @@
 import java_cup.runtime.*;
-
+import java.io.FileWriter; 
+import java.io.IOException; 
    
 action code {:
 
  public String testString = "" ; 
- public static String API_VAR = "slack.api";
- 
- 
+
 :}
 
 
@@ -44,8 +43,8 @@ terminal           SEMI, LPAREN, RPAREN, LKEY, RKEY, UNION, IF, ELSE, FOR, IN, C
 					OR, EQUAL, DIFFERENT, ASSIGN, LBRACKET, RBRACKET, LESS, BIGGER, EQUALBIGGER, EQUALLESSER, LET;
 terminal String    ID, STRING;
 
-non terminal Object     bloque, instrs, instr, programa;
-non terminal String 	strings, actions, option,comb, igualdad, rel, factor, bool, loc;
+
+non terminal String 	programa, bloque, instrs, instr, strings, actions, option,comb, igualdad, rel, factor, bool, loc;
 
 /* -------------Precedence and Associatively of Terminals Section----------- */
 
@@ -64,8 +63,7 @@ precedence left ELSE;
                     | IF LPAREN bool RPAREN instr
                     | IF LPAREN bool RPAREN instr ELSE instr
                     | FOR ID IN ID instr
-                    | CONVERSATION actions:act SEMI
-                    {: System.out.println(act + ";");
+                    | CONVERSATION actions SEMI
                     | CHAT MESSAGE option option SEMI
                     | bloque
 
@@ -111,35 +109,51 @@ precedence left ELSE;
                     | 
                  
 ----------------------------------------------------*/
-	programa	::= bloque {: System.out.println("program"); :}
+	programa	::= bloque:bl 
+					{:
+						 RESULT = "const Slack = require('slack');\nslack = Slack();\n\n" + bl; 
+					:}
 					;
 	
-	bloque      ::= LKEY instrs RKEY
+	bloque      ::= LKEY instrs:ins RKEY {: RESULT = ins;:}
 	 				;
 
-    instrs      ::= instr instrs
+    instrs      ::= instr:i instrs:ins {: RESULT = i + ins;:}
                     | 
-                    
+                    {: RESULT = ""; :}
                     ;
 
     instr       ::= loc:l ASSIGN bool:b SEMI 
-    				{: System.out.println(l+" = " + b + ";"); :}
+    				{: 
+    					RESULT = l + " = " + b + ";\n"; 
+    				:}
                     | 
-                    IF LPAREN bool RPAREN instr 
+                    IF LPAREN bool:b RPAREN instr:i 
+                    {:
+                    	RESULT = "if( " + b + " )" + i;
+                    :}
                     | 
-                    IF LPAREN bool RPAREN instr ELSE instr
+                    IF LPAREN bool:b RPAREN instr:i1 ELSE instr:i2
+                    {:
+                    	RESULT = "if( " + b + " )" + i1 + "else\n" + i2;
+                    :}
                     | 
-                    FOR ID IN ID instr
+                    FOR ID:id1 IN ID:id2 instr:i
+                    {:
+                    	RESULT = id2 + ".forEach(" + id1 + " => " + i + ");\n"; 
+                    :}
                     | 
-                    CONVERSATION actions:act SEMI {: System.out.println(act + ";"); :}
+                    CONVERSATION actions:act SEMI 
+                    {: 
+                    	RESULT = act + ";\n";  
+                    :}
                     | 
                     CHAT MESSAGE option:op1 option:op2 SEMI
                     {: 
-                    	testString = "slack.api('chat.postMessage', {\n\tchannel: " + op1 + ",\n\ttext: " + op2 + "\n});"; 
-                    	System.out.println(testString);
-                    	:} 
+                    	RESULT = "slack.api('chat.postMessage', {\n\tchannel: " + op1 + ",\n\ttext: " + op2 + "\n});\n"; 
+                    :} 
                     | 
-                    bloque
+                    bloque:bl {: RESULT = "{\n" + bl + "}\n"; :}
                     ;
 
     actions     ::= CREATE bool:b option:op
@@ -176,36 +190,45 @@ precedence left ELSE;
                     LET ID:id
                     {:  RESULT = "let " + id; :}
                     |
-                    ID
-                    {::}
+                    ID:id
+                    {: RESULT = id;:}
                     ;
 
-    bool        ::= CONVERSATION actions SEMI
+    bool        ::= CONVERSATION actions:act SEMI
+    				{: RESULT = act + ";\n"; :}
                     | 
-                    bool OR comb
+                    bool:b OR comb:c
+                    {: RESULT = b + " || " + c; :}
                     | 
                     comb:c {: RESULT = c; :}
                     ;
 
-    comb        ::= comb AND igualdad
+    comb        ::= comb:c AND igualdad:i
+    				{: RESULT = c + " && " + i; :}
                     | 
                     igualdad:i {: RESULT = i; :}
                     ;
 
-    igualdad    ::= igualdad EQUAL rel
+    igualdad    ::= igualdad:i EQUAL rel:r
+    				{: RESULT = i + " == " + r; :}
                     | 
-                    igualdad DIFFERENT rel
+                    igualdad:i DIFFERENT rel:r
+                    {: RESULT = i + " != " + r; :}
                     | 
                     rel:r {: RESULT = r; :}
                     ;
 
-    rel         ::= factor LESS factor
+    rel         ::= factor:f1 LESS factor:f2
+    				{: RESULT = f1 + " < " + f2; :} 
                     | 
-                    factor BIGGER factor
+                    factor:f1 BIGGER factor:f2
+                    {: RESULT = f1 + " > " + f2; :} 
                     | 
-                    factor EQUALLESSER factor
+                    factor:f1 EQUALLESSER factor:f2
+                    {: RESULT = f1 + " <= " + f2; :} 
                     | 
-                    factor EQUALBIGGER factor
+                    factor:f1 EQUALBIGGER factor:f2
+                    {: RESULT = f1 + " >= " + f2; :} 
                     | 
                     factor:f {: RESULT = f; :} 
                     ;

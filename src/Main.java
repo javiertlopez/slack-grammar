@@ -34,8 +34,16 @@ public class Main {
       
       
      
-	Object result = p.parse().value;   
-	System.out.println();
+	String result = (String)p.parse().value;  
+	
+	try {
+		FileWriter fw = new FileWriter("slack_code.js");
+		fw.write(result);
+		fw.flush();
+		fw.close();
+	}catch(IOException e) {
+		e.printStackTrace();
+	}
 	System.out.println("Finished analisis");
 	
     } catch (Exception e) {

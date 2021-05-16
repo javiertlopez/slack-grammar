@@ -1,5 +1,15 @@
 {
-conversation create true "channel";
-conversation archive "channel";
-chat message "channel" "si o no we";
+if("hello" > "pedro"){
+	conversation create true "channel";
+	conversation archive "channel";
+	chat message "channel" "si o no we";
+}
+else
+	const pedro = "pedro";
+	
+for pepe in chalo{
+	conversation create true "channel";
+	conversation archive "channel";
+}
+
 }
