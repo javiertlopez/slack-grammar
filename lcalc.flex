@@ -26,7 +26,7 @@ LineTerminator = \r|\n|\r\n
 WhiteSpace     = {LineTerminator} | [\ \t\f]
 letra = [A-Za-z]
 id = [A-Za-z] + [A-Za-z_0-9]*
-string = \"[a-zA-Z_@0-9.!?\ ]*\"
+string = \"[a-zA-Z_@0-9.!?\,:*+-_ ]*\"
 
 
 %%  
@@ -79,4 +79,21 @@ string = \"[a-zA-Z_@0-9.!?\ ]*\"
     {WhiteSpace}       { /* do nothing */ }   
 }
 
-[^]                    { throw new Error("Illegal character <"+yytext()+">"); }
+<YYINITIAL>[^]          { 
+							String m = "Error: line " + (yyline+1)+", columna "+(yycolumn+1) + ": lexical error";
+							System.err.println(m);
+						}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

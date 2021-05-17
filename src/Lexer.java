@@ -36,12 +36,11 @@ class Lexer implements java_cup.runtime.Scanner {
    */
   private static final String ZZ_CMAP_PACKED = 
     "\11\0\1\3\1\2\1\0\1\3\1\1\22\0\1\10\1\45\1\6"+
-    "\3\0\1\42\1\0\1\12\1\13\2\0\1\14\1\0\1\7\1\0"+
-    "\12\5\1\0\1\11\1\47\1\44\1\46\2\7\32\4\1\50\1\0"+
-    "\1\51\1\0\1\5\1\0\1\30\1\41\1\25\1\4\1\17\1\16"+
-    "\1\33\1\31\1\15\1\4\1\40\1\20\1\32\1\24\1\22\1\36"+
-    "\1\4\1\23\1\21\1\26\1\37\1\27\4\4\1\34\1\43\1\35"+
-    "\uff82\0";
+    "\3\0\1\42\1\0\1\12\1\13\2\7\1\14\3\7\12\5\1\7"+
+    "\1\11\1\47\1\44\1\46\2\7\32\4\1\50\1\7\1\51\1\7"+
+    "\1\5\1\0\1\30\1\41\1\25\1\4\1\17\1\16\1\33\1\31"+
+    "\1\15\1\4\1\40\1\20\1\32\1\24\1\22\1\36\1\4\1\23"+
+    "\1\21\1\26\1\37\1\27\4\4\1\34\1\43\1\35\uff82\0";
 
   /** 
    * Translates characters to character classes
@@ -134,8 +133,8 @@ class Lexer implements java_cup.runtime.Scanner {
     "\1\23\1\5\1\24\1\25\1\26\1\5\1\27\1\5"+
     "\1\30\1\31\1\32\1\33\1\34\1\35\1\36\1\37"+
     "\54\0\1\4\53\0\2\5\7\0\17\5\2\0\4\5"+
-    "\14\0\2\40\1\41\2\40\4\0\17\40\2\0\4\40"+
-    "\3\0\1\40\10\0\2\5\7\0\1\5\1\42\5\5"+
+    "\14\0\2\40\1\41\3\40\2\0\20\40\2\0\4\40"+
+    "\2\0\6\40\4\0\2\5\7\0\1\5\1\42\5\5"+
     "\1\43\7\5\2\0\4\5\14\0\2\5\7\0\5\5"+
     "\1\44\5\5\1\45\3\5\2\0\4\5\14\0\2\5"+
     "\7\0\3\5\1\46\13\5\2\0\4\5\14\0\2\5"+
@@ -358,7 +357,7 @@ class Lexer implements java_cup.runtime.Scanner {
     char [] map = new char[0x10000];
     int i = 0;  /* index in packed string  */
     int j = 0;  /* index in unpacked array */
-    while (i < 122) {
+    while (i < 118) {
       int  count = packed.charAt(i++);
       char value = packed.charAt(i++);
       do map[j++] = value; while (--count > 0);
@@ -699,7 +698,8 @@ class Lexer implements java_cup.runtime.Scanner {
 
       switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
         case 1: 
-          { throw new Error("Illegal character <"+yytext()+">");
+          { String m = "Error: line " + (yyline+1)+", columna "+(yycolumn+1) + ": lexical error";
+							System.err.println(m);
           }
         case 41: break;
         case 2: 

@@ -1,10 +1,75 @@
 import java_cup.runtime.*;
-import java.io.FileWriter; 
-import java.io.IOException; 
+ 
+import java.util.ArrayList;
    
 action code {:
 
  public String testString = "" ; 
+ 
+ public static void test(){
+ 	System.out.println("testing methods");
+ }	
+ 
+  public class symbol{
+ 	String type;
+ 	String id;
+ 	symbol reach;
+ 	String clase;
+ 	
+ 	public symbol(String type, String id, symbol reach, String clase){
+ 		this.type = type;
+ 		this.id = id;
+ 		this.reach = reach;
+ 		this.clase = clase;
+ 	}
+ 	
+ 	public symbol(String type, String id, String clase){
+ 		this.type = type;
+ 		this.id = id;
+ 		this.clase = clase;
+ 		this.reach = null;
+ 	}
+ 	
+ 	public void remove(int i){
+ 		if(i >= 0)
+ 			this.remove(i);
+ 		else
+ 			return;
+ 	}
+
+ }
+ 
+ public ArrayList<symbol> globalList = new ArrayList<symbol>();
+ 
+
+public int getPosition(String id){
+ 		for(int i=0; i < globalList.size(); i++){
+ 			if(globalList.get(i).id.compareTo(id) == 0) return i;
+ 		}
+ 		return -1;
+ 	}
+
+ public boolean searchID(String id){
+ 	for(int i=0; i < globalList.size(); i++)
+ 		if(globalList.get(i).id.compareTo(id) == 0) return true;
+ 	
+ 	return false;
+ }
+ 
+ public boolean isConstant(String id){
+	 for(int i=0; i < globalList.size(); i++)
+ 		if(globalList.get(i).id.compareTo(id) == 0)
+ 			if(globalList.get(i).clase.compareTo("constant") == 0) return true;
+ 		
+ 	
+ 	return false;
+ }
+ 
+ public void printTable(){
+ 		for(int i=0; i<globalList.size();i++){
+ 			System.out.println(globalList.get(i).id);
+ 		}
+ 	}
 
 :}
 
@@ -30,7 +95,6 @@ parser code {:
 
     public void report_fatal_error(String message, Object info) {
         report_error(message, info);
-        System.exit(1);
     }
 :};
 
@@ -112,20 +176,33 @@ precedence left ELSE;
 	programa	::= bloque:bl 
 					{:
 						 RESULT = "const Slack = require('slack');\nslack = Slack();\n\n" + bl; 
+						 printTable();
+						 
 					:}
 					;
 	
 	bloque      ::= LKEY instrs:ins RKEY {: RESULT = ins;:}
 	 				;
 
-    instrs      ::= instr:i instrs:ins {: RESULT = i + ins;:}
+    instrs      ::= instr:i instrs:ins 
+    				{:
+    					if(i == null)
+    						RESULT = "ERROR\n" + ins;
+    					else 
+    						RESULT = i + ins;
+    				:}
                     | 
                     {: RESULT = ""; :}
                     ;
 
     instr       ::= loc:l ASSIGN bool:b SEMI 
     				{: 
-    					RESULT = l + " = " + b + ";\n"; 
+    					if(isConstant(l)){
+    						System.err.println("trying to change constant '" + l +"': Semantic error\n aborting code generation");
+    						System.exit(1); 
+    					}
+    					else
+    						RESULT = l + " = " + b + ";\n"; 
     				:}
                     | 
                     IF LPAREN bool:b RPAREN instr:i 
@@ -138,9 +215,12 @@ precedence left ELSE;
                     	RESULT = "if( " + b + " )" + i1 + "else\n" + i2;
                     :}
                     | 
-                    FOR ID:id1 IN ID:id2 instr:i
+                    FOR ID:id1{:globalList.add(new symbol("String", id1, "variable"));:} 
+                    IN ID:id2 instr:i
                     {:
                     	RESULT = id2 + ".forEach(" + id1 + " => " + i + ");\n"; 
+                    	globalList.remove(getPosition(id1));
+                    	
                     :}
                     | 
                     CONVERSATION actions:act SEMI 
@@ -154,6 +234,8 @@ precedence left ELSE;
                     :} 
                     | 
                     bloque:bl {: RESULT = "{\n" + bl + "}\n"; :}
+                    | error RKEY
+                    | error SEMI
                     ;
 
     actions     ::= CREATE bool:b option:op
@@ -178,20 +260,42 @@ precedence left ELSE;
                     {: RESULT = "slack.api('conversations.members', {\n\tchannel: " + op + "\n})";:}
                     ;
 
-    option      ::= ID:id {: RESULT = id; :}
+    option      ::= ID:id 
+    				{: 	
+ 
+    					if(searchID(id))
+                    		RESULT = id;
+                    	else{
+                    		System.err.println("Variable '"+id+"'no declarada anteriormente");
+                    		System.exit(1); 
+                    	} 
+    				:}
                     | 
                     STRING:s strings:ss
                     {: RESULT = s + ss; :}
                     ;
 
     loc         ::= CONST ID:id
-    				{: RESULT = "const " + id; :}
+    				{: 
+    					globalList.add(new symbol("String", id, "constant"));
+    					RESULT = "const " + id; 
+    				:}
                     | 
                     LET ID:id
-                    {:  RESULT = "let " + id; :}
+                    {:  
+                    	globalList.add(new symbol("String", id, "constant"));
+                    	RESULT = "let " + id; 
+                    :}
                     |
                     ID:id
-                    {: RESULT = id;:}
+                    {: 
+                    	if(searchID(id))
+                    		RESULT = id;
+                    	else{
+                    		System.err.println("Variable '"+id+"'no declarada anteriormente");
+                    		System.exit(1); 
+                    	}
+                    :}
                     ;
 
     bool        ::= CONVERSATION actions:act SEMI
@@ -242,7 +346,15 @@ precedence left ELSE;
                     LBRACKET STRING:s strings:ss RBRACKET 
                     {: RESULT = "[" + s + ss + "]"; :}
                     |
-                    ID:id {: RESULT = id; :}
+                    ID:id 
+                    {: 
+	                	if(searchID(id))
+	                		RESULT = id;
+	                	else{
+	                		System.err.println("Variable '"+id+"'no declarada anteriormente");
+	                		System.exit(1); 
+                    	}
+                    :}
                     ;
 
     strings     ::= UNION STRING:s strings:ss {: RESULT = ", " + s + ss; :} 

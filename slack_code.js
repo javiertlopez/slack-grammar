@@ -1,28 +1,20 @@
 const Slack = require('slack');
 slack = Slack();
 
-if( "hello" > "pedro" ){
+let channels = ["channel1", "channel2"];
+const users = ["user1", "user2"];
+channels.forEach(channel => {
 slack.api('conversations.create', {
 	is_private: true,
-	name: "channel"
+	name: channel
 });
-slack.api('conversations.archive', {
-	tchannel: "channel"
+slack.api('conversations.invite', {
+	channel: channel,
+	users: users
 });
 slack.api('chat.postMessage', {
-	channel: "channel",
-	text: "si o no we"
-});
-}
-else
-const pedro = "pedro";
-chalo.forEach(pepe => {
-slack.api('conversations.create', {
-	is_private: true,
-	name: "channel"
-});
-slack.api('conversations.archive', {
-	tchannel: "channel"
+	channel: channel,
+	text: "Hello everyone, welcome"
 });
 }
 );
